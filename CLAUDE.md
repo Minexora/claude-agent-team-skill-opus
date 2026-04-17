@@ -133,7 +133,10 @@ Her yeni projede aşağıdaki yapı otomatik oluşturulur:
 <proje-adı>/
 ├── CLAUDE.md                    # Bu dosya buraya kopyalanır
 ├── .claude/
-│   └── commands/               # Slash command'lar
+│   ├── commands/               # Slash command'lar (Legacy)
+│   └── skills/
+│       └── agent-team/         # Modern Skill Tanımı
+│           └── SKILL.md
 ├── docs/
 │   ├── project_plan.md         # Team Lead oluşturur
 │   ├── requirements/           # PO yazı alanı

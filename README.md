@@ -25,7 +25,7 @@ Sıfır bir projede veya var olan bir projenizde bu yapıyı kullanmak için:
 
 2. Takımı ayağa kaldırmak ve panelleri açmak için Claude üzerinden komut verin:
    ```bash
-   /start-team
+   /project:start-team
    ```
 *(Veya Claude'a normal konuşarak "Projeyi başlat" diyebilirsiniz.)*
 
@@ -36,9 +36,11 @@ Ekip üyeleri birbirleriyle mesajlaşmak yerine **dosya üzerinden (INBOX/OUTBOX
 - Her üyenin projenin sadece **belirli alanlarına yazma** yetkisi vardır. (Örn: Backend dev frontend klasörüne yazamaz, ama okuyup API ihtiyacını görür.)
 
 ## Komutlar (Team Lead'e komut verin)
-- `/start-team` : Proje yapısını kurar ve 6'lı iTerm2 grid'ini açar.
-- `/assign-task <rol> <görev>` : Seçilen role hemen INBOX üzerinden görev atar.
-- `/team-status` : Takımdaki INBOX/OUTBOX dosyalarını okuyup kimin ne yaptığının genel tablosunu çıkarır.
+
+Bu skill yüklendiğinde aşağıdaki slash komutlarla kontrol edilebilir:
+- `/project:start-team` : Proje yapısını kurar ve 6'lı iTerm2 grid'ini açar.
+- `/project:assign-task <rol> <görev>` : Seçilen role hemen INBOX üzerinden görev atar.
+- `/project:team-status` : Takımdaki INBOX/OUTBOX dosyalarını okuyup kimin ne yaptığının genel tablosunu çıkarır.
 - `/compact` : Token dolmasını engellemek için mevcut oturumu kompakt hale getirir. (Düzenli kullanılması önerilir.)
 
 ---
