@@ -1,72 +1,137 @@
 #!/bin/bash
 
-# iTerm2 Team Layout Setup Script
-# Bu script iTerm2'de Team Lead (üstte) ve 5 ekip üyesi (altta) olacak şekilde
-# paneller oluşturur ve her birinde ilgili claude persona'sını başlatır.
+###############################
+# iTerm2 Multi-Agent Team Setup
+###############################
+# Yapı: Sol panel (Team Lead) + Sağ 5 panel (PO, UI/UX, Frontend, Backend, QA)
+# Her panel kendi persona'sı ile aktif şekilde açılır.
 
-echo "iTerm2 panelleri oluşturuluyor..."
+set -e  # Exit on error
 
-# AppleScript to control iTerm2
-osascript <<EOF
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "🚀 iTerm2 Agent Team panelleri oluşturuluyor..."
+echo ""
+
+# AppleScript aracılığıyla iTerm2'de panel layoutu kur
+osascript <<'APPLESCRIPT'
 tell application "iTerm"
     activate
     
-    # Yeni bir pencere aç veya mevcut pencereyi kullan
+    -- Yeni pencere
     if (count of windows) = 0 then
         create window with default profile
     end if
     
     tell current window
-        tell current session
-            # TEAM LEAD (Mevcut Session - ÜST)
-            write text "clear && echo -e '\\033[1;36m[ TEAM LEAD ]\\033[0m' && claude"
-            
-            # Alt paneller (5 adet)
-            
-            # 1. PO'yu dikey olarak aşağıya böl
-            set po_session to split horizontally with default profile
-            
-            # PO session içinden diğer 4'ünü yatay olarak böl
-            tell po_session
-                set fe_session to split vertically with default profile
-            end tell
-            
-            tell fe_session
-                set be_session to split vertically with default profile
-            end tell
-            
-            tell be_session
-                set ui_session to split vertically with default profile
-            end tell
-            
-            tell ui_session
-                set qa_session to split vertically with default profile
-            end tell
-            
-            # Persona'ları başlat
-            tell po_session
-                write text "clear && echo -e '\\033[1;33m[ PRODUCT OWNER ]\\033[0m' && claude -p agents/product_owner.md"
-            end tell
-            
-            tell fe_session
-                write text "clear && echo -e '\\033[1;34m[ FRONTEND DEV ]\\033[0m' && claude -p agents/frontend_dev.md"
-            end tell
-            
-            tell be_session
-                write text "clear && echo -e '\\033[1;32m[ BACKEND DEV ]\\033[0m' && claude -p agents/backend_dev.md"
-            end tell
-            
-            tell ui_session
-                write text "clear && echo -e '\\033[1;35m[ UI/UX DESIGNER ]\\033[0m' && claude -p agents/uiux_designer.md"
-            end tell
-            
-            tell qa_session
-                write text "clear && echo -e '\\033[1;31m[ TESTER / QA ]\\033[0m' && claude -p agents/tester.md"
-            end tell
-            
+        -- ADIM 1: Ana pencereyi dikey split - Sol (Team Lead) | Sağ (5 Panel)
+        set left_session to current session
+        set right_session to split vertically with default profile
+        
+        -- ADIM 2: Sağ paneli 5 yatay panel'e böl
+        tell right_session
+            set po_session to current session
+            set ui_ux_session to split horizontally with default profile
+        end tell
+        
+        tell ui_ux_session
+            set ui_ux_session_ref to current session
+            set frontend_session to split horizontally with default profile
+        end tell
+        
+        tell frontend_session
+            set frontend_session_ref to current session
+            set backend_session to split horizontally with default profile
+        end tell
+        
+        tell backend_session
+            set backend_session_ref to current session
+            set qa_session to split horizontally with default profile
+        end tell
+        
+        -- ADIM 3: Her panele başlık ve bootstrap prompt dosyası yükle
+        
+        -- Team Lead Panel (Sol)
+        tell left_session
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '🎖️ [TEAM LEAD - Proje Koordinatörü]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_team_leader.md"
+        end tell
+        
+        -- Product Owner Panel (Sağ Üst)
+        tell po_session
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '📊 [PRODUCT OWNER - Gereksinimler & Backlog]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_product_owner.md"
+        end tell
+        
+        -- UI/UX Designer Panel (Sağ 2.)
+        tell ui_ux_session_ref
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '🎨 [UI/UX DESIGNER - Tasarım Sistemi]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_ui_ux_designer.md"
+        end tell
+        
+        -- Frontend Developer Panel (Sağ 3.)
+        tell frontend_session_ref
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '🖥️ [FRONTEND DEV - Vue3 & Pinia]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_frontend_developer.md"
+        end tell
+        
+        -- Backend Developer Panel (Sağ 4.)
+        tell backend_session_ref
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '⚙️ [BACKEND DEV - Django & DRF]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_backend_developer.md"
+        end tell
+        
+        -- QA Engineer Panel (Sağ 5. / Alt)
+        tell qa_session
+            write text "cd '" & (system info's home folder) & "/Documents/ClaudeCodeFirstSkill' && clear"
+            delay 0.2
+            write text "echo '🧪 [QA ENGINEER - Test Otomasyonu]' && echo ''"
+            delay 0.1
+            write text "cat prompts/bootstrap_qa_engineer.md"
         end tell
     end tell
 end tell
-EOF
+APPLESCRIPT
 
-echo "Takım hazır!"
+echo ""
+echo "✨ Paneller oluşturuldu!"
+echo ""
+echo "📌 Panel Düzeni:"
+echo "  SOL:      🎖️  Team Lead"
+echo "  SAĞ:      📊 PO | 🎨 UI/UX | 🖥️ Frontend | ⚙️ Backend | 🧪 QA"
+echo ""
+echo "💡 Her panel bootstrap prompt dosyasını otomatik açacaktır."
+echo "🚀 Sistem ready! Ekip aktif ve görev beklemeye hazırdır."
+echo ""
+echo "📋 Panel Layout:"
+echo "┌─────────────────────────────────────────────────────────┐"
+echo "│  TEAM LEAD          │     SAĞ PANEL GRUPLARI           │"
+echo "│  (Coordinator)      ├─────────────────────────────────┤"
+echo "│                     │  📊 Product Owner               │"
+echo "│                     ├─────────────────────────────────┤"
+echo "│                     │  🎨 UI/UX Designer              │"
+echo "│                     ├─────────────────────────────────┤"
+echo "│                     │  🖥️  Frontend Developer           │"
+echo "│                     ├─────────────────────────────────┤"
+echo "│                     │  ⚙️  Backend Developer            │"
+echo "│                     ├─────────────────────────────────┤"
+echo "│                     │  🧪 QA Engineer                 │"
+echo "└─────────────────────────────────────────────────────────┘"
+echo ""
+echo "🎯 Her panel açılmıştır ve iş almaya hazırdır."
+echo "💡 İpucu: docs/reports/INBOX/ dosyalarına görev yaz"

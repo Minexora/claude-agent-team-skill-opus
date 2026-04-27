@@ -1,14 +1,35 @@
-# /team-status
+# /project:team-status
 
-Takımın şu anki durumunu ve kimin ne üzerinde çalıştığını, bitirip bitirmediğini görmek için kullanılır.
+## Purpose
+Takımın mevcut durumunu özetler: atanan görevler (INBOX), tamamlanan işler (OUTBOX) ve varsa blocker'lar.
 
-Team Lead (Sen), aşağıdaki işlemleri uygulayacaksın:
-1. `docs/reports/INBOX/` klasöründeki tüm dosyaları oku (kimlerin atanan görevleri var).
-2. `docs/reports/OUTBOX/` klasöründeki tüm dosyaları oku (kimler görevini tamamlamış).
-3. Kullanıcıya aşağıdaki gibi net bir tablo sun:
+## Input
+- Opsiyonel parametreler:
+	- `--full`: Detaylı rapor (tüm dosya içerikleri)
+	- `--blockers`: Sadece blocker'ları listeler
 
-| Rol | INBOX Durumu (Atanmış Görev) | OUTBOX Durumu (Tamamlanan) | Blocker / Sorun |
-|-----|------------------------------|----------------------------|-----------------|
-| ... | ...                          | ...                        | ...             |
+## Behavior
+1. `docs/reports/INBOX/` altındaki tüm `*_task.md` dosyalarını tarar ve her rolün şu bilgilerini çıkarır:
+	 - Atanan görev başlığı
+	 - Öncelik
+	 - Kısaca kabul kriterleri
+2. `docs/reports/OUTBOX/` altındaki tüm `*_done.md` dosyalarını tarar ve tamamlanan öğeleri listeler.
+3. Her rol için birleştirilmiş durum tablosu oluşturur:
 
-4. Takılı kalan (Blocker) bir konu varsa bunu ön plana çıkartarak kullanıcıdan karar/çözüm talep et.
+| Rol | INBOX Durumu | OUTBOX Durumu | Blocker |
+|-----|--------------|---------------|--------|
+| Frontend | Login ekranı (Yüksek) | - | Backend `/auth` eksik |
+
+4. Eğer `--blockers` verilmişse, yalnızca blocker satırlarını kullanıcıya sunar ve öneri ister.
+
+5. Eğer `--full` verilmişse, her görevin tam markdown içeriğini gösterir.
+
+## Output
+- Konsol veya sohbet üzerinde tablo formatında özet.
+- Eğer blocker varsa, kullanıcıya hangi kararların gerektiğini bildirir.
+
+---
+
+**Komut:** `/project:team-status`  
+**Durum:** Production  
+**Son Güncelleme:** 21 Nisan 2026
